@@ -134,6 +134,7 @@ export function TimeInput(props: TimeInputProps) {
             }
             onClick={() => {
               if (!hasSetTimer) {
+                console.log("has set timer");
                 props.timer.setTimer(parseInt(minutes), parseInt(seconds));
                 setHasSetTimer(true);
               }

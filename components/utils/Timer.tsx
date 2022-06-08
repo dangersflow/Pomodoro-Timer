@@ -62,6 +62,8 @@ export function useStateStore() {
 export function useTimer(state) {
   const [seconds, setSeconds] = useState(0);
   const [minutes, setMinutes] = useState(0);
+  const [currentSeconds, setCurrentSeconds] = useState(0);
+  const [totalSeconds, setTotalSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [breakTime, setBreakTime] = useState(false);
   const [currentMessage, setCurrentMessage] = useState("");
@@ -90,6 +92,10 @@ export function useTimer(state) {
       : workMessages[Math.floor(Math.random() * workMessages.length)];
   };
 
+  const totalTimeSeconds = () => {
+    return minutes * 60 + seconds;
+  };
+
   const isBreakTime = () => {
     return breakTime;
   };
@@ -106,15 +112,32 @@ export function useTimer(state) {
 
   const startTimer = () => {
     setIsActive(true);
+    if (cycleFinished) {
+      //set total seconds
+      setTotalSeconds(totalTimeSeconds());
+      //reset current seconds
+      setCurrentSeconds(0);
+      //reset cycle finished
+      setCycleFinished(false);
+    }
   };
 
   const stopTimer = () => {
     setIsActive(false);
   };
 
+  const currentTimeSeconds = () => {
+    return currentSeconds;
+  };
+
   useInterval(
     () => {
+      if (seconds <= 0 && minutes > 0) {
+        setMinutes((minutes) => minutes - 1);
+        setSeconds((seconds) => 60);
+      }
       setSeconds((seconds) => seconds - 1);
+      setCurrentSeconds((currentSeconds) => currentSeconds + 1);
     },
     isActive ? 1000 : null
   );
@@ -130,9 +153,6 @@ export function useTimer(state) {
         setCurrentMessage(getMessage(true));
         setBreakTime(true);
       }
-    } else if (seconds <= 0 && minutes > 0) {
-      setMinutes((minutes) => minutes - 1);
-      setSeconds((seconds) => 59);
     }
   }, [seconds, minutes, isActive, breakTime]);
 
@@ -142,10 +162,13 @@ export function useTimer(state) {
     currentMessage,
     cycleFinished,
     breakTime,
+    totalSeconds,
     startTimer,
     stopTimer,
     setTimer,
     isTimerActive,
     isBreakTime,
+    currentTimeSeconds,
+    totalTimeSeconds,
   };
 }

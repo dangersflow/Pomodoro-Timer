@@ -15,6 +15,7 @@ import { CircularContainer } from "../components/CircularContainer";
 import { useStateStore } from "../components/utils/Timer";
 import { GlobalStyle } from "../styles/globalStyle";
 import { motion } from "framer-motion";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
 import One from "../images/1-solid.svg";
 import React from "react";
@@ -24,6 +25,8 @@ export default function Home(props) {
   const [currentDegree, setCurrentDegree] = useState(0);
   const [pastDegree, setPastDegree] = useState(0);
   const [showMessage, setShowMessage] = useState(false);
+  const [totalSeconds, setTotalSeconds] = useState(0);
+  const [secondsSet, setSecondsSet] = useState(false);
 
   const timer = useTimer(props.state);
 
@@ -39,6 +42,10 @@ export default function Home(props) {
     if (timer.isTimerActive()) {
       setPastDegree(currentDegree);
       setCurrentDegree(currentDegree + 6);
+      if (!secondsSet) {
+        setTotalSeconds(timer.totalTimeSeconds());
+        setSecondsSet(true);
+      }
 
       if (currentDegree >= 360) {
         //delay for one second
@@ -65,6 +72,7 @@ export default function Home(props) {
       </Head>
       <Column alignItems="center" justifyContent="space-evenly" height="98vh">
         <h1>Pomodoro Timer</h1>
+
         <CircularContainer
           backgroundColor="white"
           borderRadius="100%"
@@ -82,7 +90,7 @@ export default function Home(props) {
               justifyContent="center"
               alignItems="center"
             >
-              <StackItem>
+              {/* <StackItem>
                 <motion.div
                   animate={{
                     rotate: [`${pastDegree}deg`, `${currentDegree}deg`],
@@ -100,6 +108,43 @@ export default function Home(props) {
                     }}
                   ></div>
                 </motion.div>
+              </StackItem> */}
+              <StackItem>
+                <div
+                  style={{
+                    width: "80vh",
+                    display: "flex",
+                    flexDirection: "column",
+                    zIndex: 10,
+                  }}
+                >
+                  <CircularProgressbar
+                    value={timer.currentTimeSeconds()}
+                    maxValue={totalSeconds}
+                    styles={buildStyles({
+                      // Rotation of path and trail, in number of turns (0-1)
+                      rotation: 0,
+
+                      // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
+                      strokeLinecap: "butt",
+
+                      // Text size
+                      textSize: "16px",
+
+                      // How long animation takes to go from one percentage to another, in seconds
+                      pathTransitionDuration: 0.5,
+
+                      // Can specify path transition in more detail, or remove it entirely
+                      // pathTransition: 'none',
+
+                      // Colors
+                      pathColor: `rgba(62, 152, 199, ${50 / 100})`,
+                      textColor: "#f88",
+                      trailColor: "#d6d6d6",
+                      backgroundColor: "#3e98c7",
+                    })}
+                  />
+                </div>
               </StackItem>
               <StackItem>
                 <TimeInput
